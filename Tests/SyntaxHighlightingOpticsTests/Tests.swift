@@ -69,4 +69,30 @@ final class SyntaxHighlightingOpticsTests: XCTestCase {
 
         XCTAssertEqual(deepReach.tryGet(ast), "Hello")
     }
+
+    func testRulePicking() {
+        // This is a rather hamfisted attempt at expressing a theme's highlighting rules. We always have to start at the root; that's not very useful. And from the `any` type we need to dispatch to a function with an existential.
+        let rootRules: [any RootAffineTraversalType] = [
+          // This will be skipped:
+          Root.blockLens
+            >>> /BlockToken.table
+            >>> /InlineToken.text,
+
+          // This should match:
+          Root.blockLens
+            >>> /BlockToken.blockquote
+            >>> /BlockToken.table
+            >>> /InlineToken.code,
+        ]
+
+        func toString(_ part: some RootAffineTraversalType) -> (Root) -> String? {
+            return { part.tryGet($0) as? String }
+        }
+
+        XCTAssertEqual(
+          rootRules.lazy
+            .compactMap { toString($0)(self.ast) }
+            .first,
+          "Hello")
+    }
 }

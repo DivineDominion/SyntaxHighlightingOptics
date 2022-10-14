@@ -1,8 +1,18 @@
+protocol RootAffineTraversalType {
+    typealias Whole = Root
+    associatedtype Part
+
+    var tryGet: (Whole) -> Part? { get }
+    var `set`: (Whole, Part) -> Whole { get }
+}
+
 /// A box type for ``Lens`` and ``Prism``.
 struct AffineTraversal<Whole, Part> {
     let tryGet: (Whole) -> Part?
     let set: (Whole, Part) -> Whole
 }
+
+extension AffineTraversal: RootAffineTraversalType where Whole == Root { }
 
 extension AffineTraversal {
     init(lens: Lens<Whole, Part>) {
