@@ -73,3 +73,21 @@ extension AffineTraversal {
         return .init(prism: l) >>> r
     }
 }
+
+extension Prism {
+    static func >>> <InnerPart> (
+      l: Prism<Whole, Part>,
+      r: Lens<Part, InnerPart>
+    ) -> AffineTraversal<Whole, InnerPart> {
+        return .init(prism: l) >>> .init(lens: r)
+    }
+}
+
+extension Lens {
+    static func >>> <InnerPart> (
+      l: Lens<Whole, Part>,
+      r: Prism<Part, InnerPart>
+    ) -> AffineTraversal<Whole, InnerPart> {
+        return .init(lens: l) >>> .init(prism: r)
+    }
+}
