@@ -3,8 +3,6 @@
     let set: (Whole, Part) -> Whole
 }
 
-infix operator >>>
-
 extension Lens {
     static func >>> <InnerPart> (
       l: Lens<Whole, Part>,
@@ -12,7 +10,9 @@ extension Lens {
     ) -> Lens<Whole, InnerPart> {
         return Lens<Whole, InnerPart>(
           get: { r.get(l.get($0)) },
-          set: { a, c in l.set(a, r.set(l.get(a), c)) }
-        )
+          set: { whole, innerPart in
+            let part = l.get(whole)
+            return l.set(whole, r.set(part, innerPart))
+        })
     }
 }

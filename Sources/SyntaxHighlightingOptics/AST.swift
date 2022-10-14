@@ -16,9 +16,9 @@ enum InlineToken: Equatable {
 extension Root {
     static var blockLens: Lens<Root, BlockToken> {
         .init(get: \.block,
-              set: {
-            var result = $0
-            result.block = $1
+              set: { whole, part in
+            var result = whole
+            result.block = part
             return result
         })
     }
