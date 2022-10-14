@@ -2,6 +2,16 @@ import XCTest
 @testable import SyntaxHighlightingOptics
 import CasePaths
 
+extension Prism {
+    init(casePath: CasePath<Whole, Part>) {
+        self.init(
+          tryGet: casePath.extract(from:),
+          inject: casePath.embed(_:))
+    }
+}
+
+
+
 final class SyntaxHighlightingOpticsTests: XCTestCase {
     let ast = Root(block: .blockquote(.table(.code("Hello"))))
 
@@ -21,10 +31,12 @@ final class SyntaxHighlightingOpticsTests: XCTestCase {
     func testBlockBlockPrism() {
         // Matches the associated value block *inside* the .blockquote(BlockToken) case.
         let blockquoteTokenCasePath = /BlockToken.blockquote
-        let prism = Prism(
-          tryGet: blockquoteTokenCasePath.extract(from:),
-          inject: blockquoteTokenCasePath.embed(_:))
+        let prism = Prism(casePath: blockquoteTokenCasePath)
 
         XCTAssertEqual(prism.tryGet(ast.block), .table(.code("Hello")))
+
+        // Applying the "setter" to cases is admittedly a bit odd; its basically a wrapper for `BlockToken.blockquote(...)` here.
+        let nestedQuote = BlockToken.blockquote(.table(.text("nested quote")))
+        XCTAssertEqual(prism.inject(nestedQuote), .blockquote(nestedQuote))
     }
 }
