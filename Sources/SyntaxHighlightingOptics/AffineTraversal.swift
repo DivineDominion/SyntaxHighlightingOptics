@@ -18,7 +18,7 @@ extension AffineTraversal {
     }
 }
 
-infix operator >>>
+infix operator >>>: MultiplicationPrecedence
 
 extension Lens {
     fileprivate var asAffineTraversal: AffineTraversal<Whole, Part> {
