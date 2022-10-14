@@ -65,7 +65,8 @@ final class SyntaxHighlightingOpticsTests: XCTestCase {
         let deepReach = Root.blockLens
           >>> /BlockToken.blockquote
           >>> /BlockToken.table
+          >>> /InlineToken.code
 
-        XCTAssertEqual(deepReach.tryGet(ast), .code("Hello"))
+        XCTAssertEqual(deepReach.tryGet(ast), "Hello")
     }
 }
