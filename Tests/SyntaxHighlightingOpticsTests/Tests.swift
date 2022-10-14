@@ -10,7 +10,28 @@ extension Prism {
     }
 }
 
+extension CasePath {
+    static func >>> <Whole> (
+      l: AffineTraversal<Whole, Root>,
+      r: CasePath<Root, Value>
+    ) -> AffineTraversal<Whole, Value> {
+        return l >>> .init(prism: .init(casePath: r))
+    }
 
+    static func >>> <Whole> (
+      l: Lens<Whole, Root>,
+      r: CasePath<Root, Value>
+    ) -> AffineTraversal<Whole, Value> {
+        return .init(lens: l) >>> r
+    }
+
+    static func >>> <Whole> (
+      l: Prism<Whole, Root>,
+      r: CasePath<Root, Value>
+    ) -> AffineTraversal<Whole, Value> {
+        return .init(prism: l) >>> r
+    }
+}
 
 final class SyntaxHighlightingOpticsTests: XCTestCase {
     let ast = Root(block: .blockquote(.table(.code("Hello"))))
@@ -38,5 +59,13 @@ final class SyntaxHighlightingOpticsTests: XCTestCase {
         // Applying the "setter" to cases is admittedly a bit odd; its basically a wrapper for `BlockToken.blockquote(...)` here.
         let nestedQuote = BlockToken.blockquote(.table(.text("nested quote")))
         XCTAssertEqual(prism.inject(nestedQuote), .blockquote(nestedQuote))
+    }
+
+    func testRootBlockquoteTableInlineCode() {
+        let deepReach = Root.blockLens
+          >>> /BlockToken.blockquote
+          >>> /BlockToken.table
+
+        XCTAssertEqual(deepReach.tryGet(ast), .code("Hello"))
     }
 }
